@@ -1,0 +1,19 @@
+{
+  "baseUrl" : "https://{{instance}}.service-now.com",
+  "security" : {
+    "type": "OAUTH2",
+    "grantType": "RESOURCE_OWNER_PASSWORD",
+    "clientId": "{{clientId}}",
+    "clientSecret": "{{clientSecret}}",
+    "username": "{{username}}",
+    "password": "{{password}}",
+    "scope": "",
+    "authorizationURL": "",
+    "tokenURL": "https://{{instance}}.service-now.com/oauth_token.do",
+    "tokenAuthorization": "REQUEST_BODY",
+    "authHeaderPrefix": "",
+    "accessTokenParameters": {},
+    "securityContext": {
+    }
+  }
+}
