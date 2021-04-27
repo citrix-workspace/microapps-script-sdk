@@ -1,33 +1,33 @@
 ## Script description
 The example of scripted integration with JIRA SoR. 
 Two different auth configurations can be used in this example.
-- Basic
-- OAuth2
+* Basic
+* OAuth2
 
 ## Execution examples
 
 <a id="basicAuth"></a>
-###Execute sync with basic auth
+### Execute sync with basic auth
 
-Change the _{{username}}_ and _{{username}}_ in `script-examples/jira/configJiraBasicAuth.template.json`
+Change the _{{username}}_ and _{{username}}_ in `jira/configJiraBasicAuth.template.json`
 
-`bin/run sync --name tickets --configuration-file=script-examples/jira/configJiraBasicAuth.template.json script-examples/jira/jira.js`
+`bin/run sync --name tickets --configuration-file=jira/configJiraBasicAuth.template.json jira/jira.js`
 
 or
 
-`bin/run sync --name projects --configuration-file=script-examples/jira/configJiraBasicAuth.template.json script-examples/jira/jira.js`
+`bin/run sync --name projects --configuration-file=jira/configJiraBasicAuth.template.json jira/jira.js`
 
 ###Execute sync with OAuth2
 
-Replace all `{{...}}` placeholders in `script-examples/jira/configJiraOauth.template.json` with real ones.
+Replace all `{{...}}` placeholders in `jira/configJiraOauth.template.json` with real ones.
 (_Use for instance [Insomnia](https://insomnia.rest) to get the refreshToken.
 See [authentication documentation](https://support.insomnia.rest/article/38-authentication)_)
 
-`bin/run sync --name tickets --configuration-file=script-examples/jira/configJiraOauth.template.json --context-type=FILE script-examples/jira/jira.js`
+`bin/run sync --name tickets --configuration-file=jira/configJiraOauth.template.json --context-type=FILE jira/jira.js`
 
 or
 
-`bin/run sync --name projects --configuration-file=script-examples/jira/configJiraOauth.template.json --context-type=FILE  script-examples/jira/jira.js`
+`bin/run sync --name projects --configuration-file=jira/configJiraOauth.template.json --context-type=FILE  jira/jira.js`
        
 ---
 **NOTE**
@@ -45,15 +45,14 @@ otherwise the REST call will fail.
 See [Execute sync with basic auth](#basicAuth) to prepare `configJiraBasicAuth.json` config file. Basic auth
 and `baseUrl` are not provided as CLI arguments in the example.
 
-`bin/run action --name createTicket --configuration-file=script-examples/jira/configJiraBasicAuth.template.json --parameters projectKey:MYPROJECT,summary:"This is summmary",description:"This is description",issueType:Task,reporterId:johndoe script-examples/jira/jira.js`
+`bin/run action --name createTicket --configuration-file=jira/configJiraBasicAuth.template.json --parameters projectKey:MYPROJECT,summary:"This is summmary",description:"This is description",issueType:Task,reporterId:johndoe jira/jira.js`
 
 #### Command line arguments
 
 * `bin/run` - executable SDK binary
 * `action` - command to run
-* `--name createTicket` - action to run, see `jira.js` for action declarations, it's not a `function` name but it's good
-  convention to use the same name for the `function`
-* `--configuration-file=script-examples/jira/configJiraBasicAuth.template.json` - path to configuration file
+* `--name createTicket` - action to run, see `jira.js` for action declarations, it's not a `function` name but it's good convention to use the same name for the `function`
+* `--configuration-file=jira/configJiraBasicAuth.template.json` - path to configuration file
 * `--parameters`
     * `projectKey` (mandatory) - can be derived from project dashboard
       URL `https://jira.acme.com/secure/RapidBoard.jspa?rapidView=1&projectKey=MYPROJECT` or from some existing project
@@ -61,7 +60,5 @@ and `baseUrl` are not provided as CLI arguments in the example.
     * `summary` (mandatory) - issue summary or title
     * `description` (mandatory) - issue description
     * `issueType` (mandatory) - depends on the project configuration, typical values are `Bug`, `Task`, `Story`, etc.
-    * `reporterId` (optional) - reporter ID or username (depends on project configuration), the issue is created with
-      reporter same as username used in credentials reporter, if `reporterId` is used then the issue is updated
-      accordingly
-* `script-examples/jira/jira.js` - path to Javascript file   
+    * `reporterId` (optional) - reporter ID or username (depends on project configuration), the issue is created with reporter same as username used in credentials reporter, if `reporterId` is used then the issue is updated accordingly
+* `jira/jira.js` - path to Javascript file   

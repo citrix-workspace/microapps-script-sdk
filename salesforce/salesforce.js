@@ -31,10 +31,10 @@ integration.define({
     ]
 })
 
-function attachDocument({client, actionParameters}) {
+async function attachDocument({client, actionParameters}) {
     console.log(`attaching file(s)`);
     const url = `/services/data/v51.0/sobjects/Document/`;
-    actionParameters.attachments.forEach(file => {
+    for (const file of actionParameters.attachments) {
         const formData = new FormData();
         const dotIndex = file.name.lastIndexOf('.');
         const name = file.name.slice(0, dotIndex);
@@ -48,7 +48,7 @@ function attachDocument({client, actionParameters}) {
         "}"], {type: 'application/json'});
         formData.append("entity_document", blob)
         formData.append("Body", file);
-        const response = client.fetchSync(url, {
+        const response = await client.fetch(url, {
             method: 'POST',
             body: formData
         });
@@ -60,5 +60,5 @@ function attachDocument({client, actionParameters}) {
             console.error(response._bodyText);
             throw new Error(errorMessage);
         }
-    })
+    }
 }

@@ -1,3 +1,76 @@
+integration.define({
+    synchronizations: [
+        {
+            name: "tasks",
+            fullSyncFunction: fullSync
+        }
+    ],
+    actions: [
+        {
+            name: "uploadAttachment",
+            parameters: [
+                {
+                    name: 'table_name',
+                    type: 'STRING',
+                    required: true
+                },
+                {
+                    name: 'table_sys_id',
+                    type: 'STRING',
+                    required: true
+                },
+                {
+                    name: 'attachments',
+                    type: 'FILES',
+                    required: true
+                }
+            ],
+            function: uploadAttachment,
+        },
+        {
+            name: "addAttachmentsAsBinary",
+            parameters: [
+                {
+                    name: 'table_name',
+                    type: 'STRING',
+                    required: true
+                },
+                {
+                    name: 'table_sys_id',
+                    type: 'STRING',
+                    required: true
+                },
+                {
+                    name: 'file_name',
+                    type: 'STRING',
+                    required: true
+                },
+                {
+                    name: 'attachments',
+                    type: 'FILES',
+                    required: true
+                }
+            ],
+            function: addAttachmentsAsBinary,
+        }
+    ],
+    model: {
+        tables: [
+            {
+                name: "tasks",
+                columns: [
+                    {
+                        name: "sys_id",
+                        type: "STRING",
+                        length: 100,
+                        primaryKey: true
+                    }
+                ]
+            }
+        ]
+    }
+})
+
 function fullSync({client, dataStore}) {
     let offset = 0
     do {
@@ -57,76 +130,3 @@ function addAttachmentsAsBinary({client, actionParameters}) {
         }
     });
 }
-
-integration.define({
-    "synchronizations": [
-        {
-            "name": "tasks",
-            "fullSyncFunction": fullSync
-        }
-    ],
-    actions: [
-        {
-            name: "uploadAttachment",
-            parameters: [
-                {
-                    name: 'table_name',
-                    type: 'STRING',
-                    required: true
-                },
-                {
-                    name: 'table_sys_id',
-                    type: 'STRING',
-                    required: true
-                },
-                {
-                    name: 'attachments',
-                    type: 'FILES',
-                    required: true
-                }
-            ],
-            function: uploadAttachment,
-        },
-        {
-            name: "addAttachmentsAsBinary",
-            parameters: [
-                {
-                    name: 'table_name',
-                    type: 'STRING',
-                    required: true
-                },
-                {
-                    name: 'table_sys_id',
-                    type: 'STRING',
-                    required: true
-                },
-                {
-                    name: 'file_name',
-                    type: 'STRING',
-                    required: true
-                },
-                {
-                    name: 'attachments',
-                    type: 'FILES',
-                    required: true
-                }
-            ],
-            function: addAttachmentsAsBinary,
-        }
-    ],
-    "model": {
-        "tables": [
-            {
-                "name": "tasks",
-                "columns": [
-                    {
-                        "name": "sys_id",
-                        "type": "STRING",
-                        "length": 100,
-                        "primaryKey": true
-                    }
-                ]
-            }
-        ]
-    }
-})

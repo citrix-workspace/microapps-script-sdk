@@ -1,101 +1,104 @@
 integration.define({
-    "synchronizations": [
+    synchronizations: [
         {
-            "name": "currencies", // Logical name
-            "fullSyncFunction": fullSyncCurrencies
+            name: "currencies",
+            fullSyncFunction: fullSyncCurrencies
 
         }
     ],
-    "actions": [
+    actions: [
         {
-            "name": "getRate",
-            "parameters": [
+            name: "getRate",
+            parameters: [
                 {
-                    "name": "symbol",
-                    "type": "STRING",
-                    "required": true
+                    name: "symbol",
+                    type: "STRING",
+                    required: true
                 }
             ],
-            "function": actionGetRate
+            function: actionGetRate
         }
     ],
-    "model": {
-        "tables": [
+    model: {
+        tables: [
             {
-                "name": "rates",
-                "columns": [
+                name: "rates",
+                columns: [
                     {
-                        "name": "id",
-                        "type": "STRING",
-                        "length": 100,
-                        "primaryKey": true
+                        name: "id",
+                        type: "STRING",
+                        length: 100,
+                        primaryKey: true
                     },
                     {
-                        "name": "symbol",
-                        "type": "STRING",
-                        "length": 5
+                        name: "symbol",
+                        type: "STRING",
+                        length: 5
                     },
                     {
-                        "name": "rateUsd",
-                        "type": "STRING"
+                        name: "rateUsd",
+                        type: "STRING"
                     }
 
                 ]
             },
             {
-                "name": "currencies",
-                "columns": [
+                name: "currencies",
+                columns: [
                     {
-                        "name": "id",
-                        "type": "STRING",
-                        "length": 100,
-                        "primaryKey": true
+                        name: "id",
+                        type: "STRING",
+                        length: 100,
+                        primaryKey: true
                     },
                     {
-                        "name": "symbol",
-                        "type": "STRING",
-                        "length": 5
+                        name: "symbol",
+                        type: "STRING",
+                        length: 5
                     }
 
                 ]
             }
         ],
-        "relationships": [
+        relationships: [
             {
-                "name": "rates2currencies",
-                "primaryTable": "rates",
-                "foreignTable": "currencies",
-                "columnPairs": [
+                name: "rates2currencies",
+                primaryTable: "rates",
+                foreignTable: "currencies",
+                columnPairs: [
                     {
-                        "primaryKey": "id",
-                        "foreignKey": "id"
+                        primaryKey: "id",
+                        foreignKey: "id"
                     },
                     {
-                        "primaryKey": "symbol",
-                        "foreignKey": "symbol"
+                        primaryKey: "symbol",
+                        foreignKey: "symbol"
                     }
                 ]
             }
         ]
     },
-    "integrationParameters": [
+    integrationParameters: [
         {
-            "name": "debug",
-            "label": "Debug",
-            "type": "BOOLEAN",
-            "required": true,
-            "defaultValue": true,
+            name: "debug",
+            label: "Debug",
+            type: "BOOLEAN",
+            required: true,
+            defaultValue: true,
         },
         {
-            "name": "simulateError",
-            "label": "Simulate error",
-            "type": "BOOLEAN",
-            "required": true,
-            "defaultValue": false,
+            name: "simulateError",
+            label: "Simulate error",
+            type: "BOOLEAN",
+            required: true,
+            defaultValue: false,
         }
     ]
 })
 
+/**
+ * Synchronize all currencies
+ */
 async function fullSyncCurrencies({dataStore, client}) {
     let response = await client.fetch('/v2/assets', {
             headers: {
@@ -112,14 +115,19 @@ async function fullSyncCurrencies({dataStore, client}) {
     }
 }
 
-function actionGetRate({actionParameters, user, client, dataStore, serviceClient, integrationParameters}) {
+/**
+ * Fetch one rate and adds it to the cache
+ * The example show how to work with action and integration parameter
+ */
+async function actionGetRate({actionParameters, client, dataStore, integrationParameters}) {
     const {symbol} = actionParameters
     const {debug} = integrationParameters
     if (debug) {
         console.log(`Requested symbol: ${symbol}`)
     }
 
-    const rates = client.fetchSync('/v2/rates').jsonSync()
+    const response = await client.fetch('/v2/rates')
+    const rates = await response.json()
     if (debug) {
         console.log(`Body: ${JSON.stringify(rates.data)}`);
     }

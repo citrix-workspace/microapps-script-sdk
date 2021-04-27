@@ -4,13 +4,21 @@ These examples demonstrate the _tasks_ synchronizations, as well as working with
 
 ## Execution examples
 
-Replace all `{{...}}` placeholders in `script-examples/serviceNow/configSnowOauth.template.json` with real ones. 
+Replace all `{{...}}` placeholders in `serviceNow/configSnowOauth.template.json` with real ones. 
+(_Use for instance [Insomnia](https://insomnia.rest) to get the refreshToken.
+See [authentication documentation](https://support.insomnia.rest/article/38-authentication)_)
 
-###Execute tasks sync
+### Execute tasks sync
 
-`bin/run sync --name tasks --configuration-file=script-examples/serviceNow/configSnowOauth.template.json script-examples/serviceNow/snow.js`
+`bin/run sync --name tasks --configuration-file=serviceNow/configSnowOauth.template.json serviceNow/snow.js`
 
-###Execute supergroups sync
+### Execute supergroups sync
 
-`bin/run sync --name snowUserGroups --configuration-file=script-examples/serviceNow/configSnowOauth.template.json script-examples/serviceNow/snowUserGroups.js`
+`bin/run sync --name snowUserGroups --configuration-file=serviceNow/configSnowOauth.template.json serviceNow/snowUserGroups.js`
 
+---
+**NOTE**
+
+The obtained access token will be stored in the _security_context.json_ file inside the work/auth directory. It will be reused during subsequent script executions.
+
+---

@@ -1,5 +1,21 @@
 const {User, Group, UserGroupMapping} = library.load("microapp-user-groups");
 
+integration.define({
+    synchronizations: [
+        {
+            name: "snowUserGroups",
+            fullSyncFunction: fullSync,
+        }
+    ],
+    model: {
+        tables: [
+            User.tableModel,
+            Group.tableModel,
+            UserGroupMapping.tableModel
+        ]
+    }
+})
+
 function fullSync(params) {
     fullSyncUsers(params)
     fullSyncGroups(params)
@@ -69,19 +85,3 @@ function fullSyncUserGroupMapping({client, dataStore}) {
         console.log(`offset: ${offset}`)
     } while (offset < 400)
 }
-
-integration.define({
-    synchronizations: [
-        {
-            name: "snowUserGroups",
-            fullSyncFunction: fullSync,
-        }
-    ],
-    model: {
-        tables: [
-            User.tableModel,
-            Group.tableModel,
-            UserGroupMapping.tableModel
-        ]
-    }
-})
