@@ -1,4 +1,5 @@
 ## Script description
+
 The example of scripted integration shows how to use FILE action parameter type in your action.
 
 ## Execution examples
@@ -12,11 +13,9 @@ See [authentication documentation](https://support.insomnia.rest/article/38-auth
 `bin/run action --name attachDocument --parameters='folderId:yourFolderId,photos:[file.png,file.pdf]' --configuration-file=salesforce/configSalesforceOauth.template.json salesforce/salesforce.js`
 
 ---
+
 **NOTE**
 
 The obtained access token will be stored in the _security_context.json_ file inside the work/auth directory. It will be reused during subsequent script executions.
 
 ---
-
-
-

@@ -11,7 +11,7 @@
     "tokenURL": "https://test.salesforce.com/services/oauth2/token",
     "tokenAuthorization": "REQUEST_BODY",
     "authHeaderPrefix": "",
-    "tokenRequestContentType" : "APPLICATION_FORM_URLENCODED",
+    "tokenRequestContentType": "APPLICATION_FORM_URLENCODED",
     "securityContext": {
       "tokenType": "Bearer",
       "refreshToken": "{{refreshToken}}",

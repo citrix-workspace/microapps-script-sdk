@@ -1,12 +1,15 @@
 ## Script description
-The example of scripted integration with JIRA SoR. 
+
+The example of scripted integration with JIRA SoR.
 Two different auth configurations can be used in this example.
-* Basic
-* OAuth2
+
+- Basic
+- OAuth2
 
 ## Execution examples
 
 <a id="basicAuth"></a>
+
 ### Execute sync with basic auth
 
 Change the _{{username}}_ and _{{username}}_ in `jira/configJiraBasicAuth.template.json`
@@ -27,9 +30,10 @@ See [authentication documentation](https://support.insomnia.rest/article/38-auth
 
 or
 
-`bin/run sync --name projects --configuration-file=jira/configJiraOauth.template.json --context-type=FILE  jira/jira.js`
-       
+`bin/run sync --name projects --configuration-file=jira/configJiraOauth.template.json --context-type=FILE jira/jira.js`
+
 ---
+
 **NOTE**
 
 The obtained access token will be stored in the _security_context.json_ file inside the work/auth directory. It will be reused during subsequent script executions.
@@ -49,16 +53,16 @@ and `baseUrl` are not provided as CLI arguments in the example.
 
 #### Command line arguments
 
-* `bin/run` - executable SDK binary
-* `action` - command to run
-* `--name createTicket` - action to run, see `jira.js` for action declarations, it's not a `function` name but it's good convention to use the same name for the `function`
-* `--configuration-file=jira/configJiraBasicAuth.template.json` - path to configuration file
-* `--parameters`
-    * `projectKey` (mandatory) - can be derived from project dashboard
-      URL `https://jira.acme.com/secure/RapidBoard.jspa?rapidView=1&projectKey=MYPROJECT` or from some existing project
-      issue key: `MYPROJECT-1234`
-    * `summary` (mandatory) - issue summary or title
-    * `description` (mandatory) - issue description
-    * `issueType` (mandatory) - depends on the project configuration, typical values are `Bug`, `Task`, `Story`, etc.
-    * `reporterId` (optional) - reporter ID or username (depends on project configuration), the issue is created with reporter same as username used in credentials reporter, if `reporterId` is used then the issue is updated accordingly
-* `jira/jira.js` - path to Javascript file   
+- `bin/run` - executable SDK binary
+- `action` - command to run
+- `--name createTicket` - action to run, see `jira.js` for action declarations, it's not a `function` name but it's good convention to use the same name for the `function`
+- `--configuration-file=jira/configJiraBasicAuth.template.json` - path to configuration file
+- `--parameters`
+  - `projectKey` (mandatory) - can be derived from project dashboard
+    URL `https://jira.acme.com/secure/RapidBoard.jspa?rapidView=1&projectKey=MYPROJECT` or from some existing project
+    issue key: `MYPROJECT-1234`
+  - `summary` (mandatory) - issue summary or title
+  - `description` (mandatory) - issue description
+  - `issueType` (mandatory) - depends on the project configuration, typical values are `Bug`, `Task`, `Story`, etc.
+  - `reporterId` (optional) - reporter ID or username (depends on project configuration), the issue is created with reporter same as username used in credentials reporter, if `reporterId` is used then the issue is updated accordingly
+- `jira/jira.js` - path to Javascript file
