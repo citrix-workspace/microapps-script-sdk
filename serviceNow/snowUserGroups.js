@@ -13,26 +13,28 @@ integration.define({
 });
 
 function fullSync(params) {
-  fullSyncUsers(params);
-  fullSyncGroups(params);
-  fullSyncUserGroupMapping(params);
+  return Promise.all([
+    fullSyncUsers(params),
+    fullSyncGroups(params),
+    fullSyncUserGroupMapping(params),
+  ]);
 }
 
-function fullSyncUsers({ client, dataStore }) {
+async function fullSyncUsers({ client, dataStore }) {
   let offset = 0;
   do {
-    const response = client.fetchSync(
+    const response = await client.fetch(
       `/api/now/table/sys_user?sysparm_query=active%3Dtrue&sysparm_limit=100&sysparm_offset=${offset}`
     );
     if (!response.ok) {
       console.log("Error status:", response.status, response.statusText);
-      console.log("Error body:", response.textSync());
+      console.log("Error body:", await response.text());
       throw new Error("Network response was not ok");
     }
     console.log("fetch done");
 
-    const users = response.jsonSync().result;
-    console.log("userrs", users);
+    const { result: users } = await response.json();
+    console.log("users", users);
 
     users.map((user) =>
       console.log(
@@ -63,19 +65,19 @@ function fullSyncUsers({ client, dataStore }) {
   } while (offset < 400);
 }
 
-function fullSyncGroups({ client, dataStore }) {
+async function fullSyncGroups({ client, dataStore }) {
   let offset = 0;
   do {
-    const response = client.fetchSync(
+    const response = await client.fetch(
       `/api/now/table/sys_user_group?sysparm_query=active%3Dtrue&sysparm_limit=100&sysparm_offset=${offset}`
     );
     if (!response.ok) {
       console.log("Error status:", response.status, response.statusText);
-      console.log("Error body:", response.textSync());
+      console.log("Error body:", await response.text());
       throw new Error("Network response was not ok");
     }
 
-    const groups = response.jsonSync().result;
+    const { result: groups } = await response.json();
     groups.map((group) =>
       console.log(
         group.name,
@@ -105,19 +107,19 @@ function fullSyncGroups({ client, dataStore }) {
   } while (offset < 400);
 }
 
-function fullSyncUserGroupMapping({ client, dataStore }) {
+async function fullSyncUserGroupMapping({ client, dataStore }) {
   let offset = 0;
   do {
-    const response = client.fetchSync(
+    const response = await client.fetch(
       `/api/now/table/sys_user_grmember?&sysparm_limit=100&sysparm_offset=${offset}`
     );
     if (!response.ok) {
       console.log("Error status:", response.status, response.statusText);
-      console.log("Error body:", response.textSync());
+      console.log("Error body:", await response.text());
       throw new Error("Network response was not ok");
     }
 
-    const mappings = response.jsonSync().result;
+    const { result: mappings } = await response.json();
     mappings.map((mapping) =>
       console.log(mapping.user.value, mapping.group.value)
     );

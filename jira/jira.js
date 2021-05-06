@@ -131,7 +131,7 @@ integration.define({
 });
 
 async function syncTickets(dataStore, client, jql) {
-  var searchParameters = {
+  const searchParameters = {
     startAt: 0,
     maxResults: 50,
     fields: [
@@ -156,9 +156,10 @@ async function syncTickets(dataStore, client, jql) {
     jql,
   };
 
+  let currentResponse;
   do {
     console.log(`syncTickets(startAt=${searchParameters.startAt}, jql=${jql})`);
-    var ret = await client.fetch("rest/api/2/search", {
+    const ret = await client.fetch("rest/api/2/search", {
       method: "POST",
       body: JSON.stringify(searchParameters),
     });
@@ -168,13 +169,10 @@ async function syncTickets(dataStore, client, jql) {
     }
     currentResponse = await ret.json();
     console.log(
-      "ticket response received, status: " +
-        ret.status +
-        ", total: " +
-        currentResponse.total
+      `ticket response received, status: ${ret.status}, total: ${currentResponse.total}`
     );
 
-    let issues = currentResponse.issues.map((issue) => {
+    const issues = currentResponse.issues.map((issue) => {
       return {
         id: parseInt(issue.id),
         key: issue.key,
@@ -211,7 +209,7 @@ function incrementalSyncTickets({
   latestSynchronizationTime,
 }) {
   print(`JIRA inc sync at ${latestSynchronizationTime}`);
-  const updatedDateTime = moment(new Date(latestSynchronizationTime)).format(
+  const updatedDateTime = moment(latestSynchronizationTime).format(
     "YYYY-MM-DD HH:mm"
   );
   const jql = `updated >= '${updatedDateTime}'`;
@@ -269,81 +267,82 @@ async function createTicket({ client, dataStore, actionParameters }) {
     },
     body: JSON.stringify(issueRequest),
   });
-  if (postIssueResponse.ok) {
-    const { id, key, self: link } = await postIssueResponse.json();
-    console.log(
-      `Issue '${summary}' successfully created: id=${id}, key=${key}, link=${link}`
-    );
-
-    const getIssueResponse = await client.fetch(`/rest/api/2/issue/${id}`);
-    let issueFields = null;
-    if (getIssueResponse.ok) {
-      ({ fields: issueFields } = await getIssueResponse.json());
-    } else {
-      throw new Error(`Get ticket error: ${getIssueResponse.statusText}`);
-    }
-
-    const ticketModel = {
-      id: parseInt(id),
-      key,
-      summary,
-      created: new Date(issueFields.created),
-      project: projectKey,
-      reporter_email: issueFields.reporter.emailAddress,
-      reporter_name: issueFields.reporter.displayName,
-      status: issueFields.status.name,
-    };
-
-    dataStore.save("tickets", ticketModel);
-  } else {
+  if (!postIssueResponse.ok) {
     const errorMessage = `Request failed(${postIssueResponse.status}: ${postIssueResponse.statusText})`;
     console.error(errorMessage);
+    console.log("Error body:", await postIssueResponse.text());
     throw new Error(errorMessage);
   }
+
+  const { id, key, self: link } = await postIssueResponse.json();
+  console.log(
+    `Issue '${summary}' successfully created: id=${id}, key=${key}, link=${link}`
+  );
+
+  const getIssueResponse = await client.fetch(`/rest/api/2/issue/${id}`);
+  if (!getIssueResponse.ok) {
+    throw new Error(`Get ticket error: ${getIssueResponse.statusText}`);
+  }
+
+  const { fields: issueFields } = await getIssueResponse.json();
+  const ticketModel = {
+    id: parseInt(id),
+    key,
+    summary,
+    created: new Date(issueFields.created),
+    project: projectKey,
+    reporter_email: issueFields.reporter.emailAddress,
+    reporter_name: issueFields.reporter.displayName,
+    status: issueFields.status.name,
+  };
+
+  dataStore.save("tickets", ticketModel);
 }
 
 async function addAttachmentsOneByOne({ client, actionParameters }) {
   console.log(`attaching file to issue ${actionParameters.issueKey}`);
-  const url = `/rest/api/2/issue/${actionParameters.issueKey}/attachments`;
   for (const file of actionParameters.attachments) {
     const formData = new FormData();
     formData.append("file", file);
-    const response = await client.fetch(url, {
-      method: "POST",
-      headers: {
-        "X-Atlassian-Token": "nocheck",
-      },
-      body: formData,
-    });
-    if (response.ok) {
-      console.log(`Attachment ${file.name} posted`);
-    } else {
+    const response = await client.fetch(
+      `/rest/api/2/issue/${actionParameters.issueKey}/attachments`,
+      {
+        method: "POST",
+        headers: {
+          "X-Atlassian-Token": "nocheck",
+        },
+        body: formData,
+      }
+    );
+    if (!response.ok) {
       const errorMessage = `Request failed(${response.status}: ${response.statusText})`;
       console.error(errorMessage);
       throw new Error(errorMessage);
     }
+    console.log(`Attachment ${file.name} posted`);
   }
 }
 
 async function addAttachmentsSingleRequest({ client, actionParameters }) {
   console.log(`attaching file(s) to issue ${actionParameters.issueKey}`);
   const formData = new FormData();
-  const url = `/rest/api/2/issue/${actionParameters.issueKey}/attachments`;
   actionParameters.attachments.forEach((file) => {
     formData.append("file", file);
   });
-  const response = await client.fetch(url, {
-    method: "POST",
-    headers: {
-      "X-Atlassian-Token": "nocheck",
-    },
-    body: formData,
-  });
-  if (response.ok) {
-    console.log("Attachment(s) posted");
-  } else {
+  const response = await client.fetch(
+    `/rest/api/2/issue/${actionParameters.issueKey}/attachments`,
+    {
+      method: "POST",
+      headers: {
+        "X-Atlassian-Token": "nocheck",
+      },
+      body: formData,
+    }
+  );
+  if (!response.ok) {
     const errorMessage = `Request failed(${response.status}: ${response.statusText})`;
     console.error(errorMessage);
     throw new Error(errorMessage);
   }
+  console.log("Attachment(s) posted");
 }

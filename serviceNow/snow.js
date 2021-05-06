@@ -71,71 +71,72 @@ integration.define({
   },
 });
 
-function fullSync({ client, dataStore }) {
+async function fullSync({ client, dataStore }) {
   let offset = 0;
   do {
     console.log("tasks page " + offset);
-    let sysparm_offset = offset++ * 100 + "";
-    console.log(encodeURIComponent("aaa bbb"));
-    let response = client.fetchSync(
-      "/api/now/table/task?sysparm_query=active%3Dtrue&sysparm_limit=100&sysparm_offset=" +
-        sysparm_offset
+    const response = await client.fetch(
+      `/api/now/table/task?sysparm_query=active%3Dtrue&sysparm_limit=100&sysparm_offset=${offset}`
     );
 
-    if (!response.ok)
+    if (!response.ok) {
       throw new Error(
         `Request failed(${response.status}: ${response.statusText})`
       );
+    }
 
-    console.log("task response received, status: " + response.status);
-    response.json().then((body) => {
-      dataStore.save("tasks", body.result);
-    });
-  } while (offset < 3);
+    console.log(`task response received, status: ${response.status}`);
+    const body = await response.json();
+    dataStore.save("tasks", body.result);
+    offset += 100;
+  } while (offset < 300);
 }
 
-function uploadAttachment({ client, actionParameters }) {
+async function uploadAttachment({ client, actionParameters }) {
   console.log(
     `attaching file(s) to table ${actionParameters.table_name}, table_sys_id ${actionParameters.table_sys_id}`
   );
-  const url = `/api/now/attachment/upload`;
-  actionParameters.attachments.forEach((file) => {
+
+  for (const file of actionParameters.attachments) {
     const formData = new FormData();
     formData.append("table_name", actionParameters.table_name);
     formData.append("table_sys_id", actionParameters.table_sys_id);
     formData.append("file", file);
-    const response = client.fetchSync(url, {
+
+    const response = await client.fetch("/api/now/attachment/upload", {
       method: "POST",
       body: formData,
     });
-    if (response.ok) {
-      console.log(`Attachment ${file.name} posted`);
-    } else {
+    if (!response.ok) {
       const errorMessage = `Request failed(${response.status}: ${response.statusText})`;
       console.error(errorMessage);
-      console.log(response._bodyText);
+      console.log(await response.text());
       throw new Error(errorMessage);
     }
-  });
+
+    console.log(`Attachment ${file.name} posted`);
+  }
 }
 
-function addAttachmentsAsBinary({ client, actionParameters }) {
+async function addAttachmentsAsBinary({ client, actionParameters }) {
   console.log(
     `attaching file(s) to table ${actionParameters.table_name}, table_sys_id ${actionParameters.table_sys_id}`
   );
-  actionParameters.attachments.forEach((file) => {
+
+  for (const file of actionParameters.attachments) {
     const url = `/api/now/attachment/file?table_name=${actionParameters.table_name}&table_sys_id=${actionParameters.table_sys_id}&file_name=${file.name}`;
-    const response = client.fetchSync(url, {
+    const response = await client.fetch(url, {
       method: "POST",
       body: file,
     });
-    if (response.ok) {
-      console.log(`Attachment ${file.name} posted`);
-    } else {
+
+    if (!response.ok) {
       const errorMessage = `Request failed(${response.status}: ${response.statusText})`;
       console.error(errorMessage);
-      console.error(response._bodyText);
+      console.log(await response.text());
       throw new Error(errorMessage);
     }
-  });
+
+    console.log(`Attachment ${file.name} posted`);
+  }
 }

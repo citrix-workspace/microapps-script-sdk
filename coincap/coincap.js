@@ -97,14 +97,14 @@ integration.define({
  * Synchronize all currencies
  */
 async function fullSyncCurrencies({ dataStore, client }) {
-  let response = await client.fetch("/v2/assets", {
+  const response = await client.fetch("/assets", {
     headers: {
       "Content-Type": "text/json",
     },
   });
   console.log(`Status: ${response.status} (${response.statusText})`);
   if (response.ok) {
-    let body = await response.json();
+    const body = await response.json();
     dataStore.save("currencies", body.data);
   } else {
     throw new Error(response.statusText);
@@ -127,7 +127,7 @@ async function actionGetRate({
     console.log(`Requested symbol: ${symbol}`);
   }
 
-  const response = await client.fetch("/v2/rates");
+  const response = await client.fetch("/rates");
   const rates = await response.json();
   if (debug) {
     console.log(`Body: ${JSON.stringify(rates.data)}`);
