@@ -1,0 +1,11 @@
+{
+  "baseUrl": "https://iws.atlassian.net",
+  "security": {
+    "type": "BASIC",
+    "username": "{{username}}",
+    "password": "{{password}}"
+  },
+  "serviceActionSecurity": {
+    "type": "NONE"
+  }
+}
