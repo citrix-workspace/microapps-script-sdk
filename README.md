@@ -8,7 +8,7 @@ They can be directly imported in your microap server instance or enhanced using 
 
 ## Documentation
 
-See the [script api documentation](https://developer.cloud.com/citrixworkspace/citrix-workspace-platform)
+See the [script api documentation](https://developer.cloud.com/citrixworkspace/citrix-workspace-platform/build-workspace-microapp-integrations/docs/scripting-getting-started)
 
 ## License
 
