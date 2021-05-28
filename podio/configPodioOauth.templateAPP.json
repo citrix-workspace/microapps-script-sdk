@@ -1,0 +1,23 @@
+{
+  "baseUrl": "https://api.podio.com",
+
+  "security": {
+    "type": "OAUTH2",
+    "grantType": "CLIENT_CREDENTIALS",
+	"clientId": "{{clientId}}",
+    "clientSecret": "{{clientSecret}}",
+    "scope": "",
+    "tokenURL": "https://api.podio.com/oauth/token",
+    "tokenAuthorization": "REQUEST_BODY",
+    "authHeaderPrefix": "",
+	"accessTokenParameters": {
+		"app_id":"{{broadcast_app_id}}",
+		"app_token":"{{broadcast_app_token}}"
+		}
+  },
+  "integrationParametersValues": {
+    "broadcast_app_id": "{{broadcast_app_id}}",
+    "broadcast_view_id": "{{broadcast_view_id}}",
+	"talkativeConsole": "true"
+    }
+}
