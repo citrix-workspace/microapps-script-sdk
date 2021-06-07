@@ -16,8 +16,8 @@ This example shows:
 
 ### Execute action
 
-`bin/run action --name getRate --parameters symbol:SAR --base-url https://api.coincap.io/v2/v2/ coincap/coincap.js`
+`bin/run action --name getRate --parameter symbol=SAR --base-url https://api.coincap.io/v2/v2/ coincap/coincap.js`
 
 ### Execute action without debug
 
-`bin/run action --name getRate --parameters symbol:SAR --integration-parameters debug:false --base-url https://api.coincap.io/v2/ coincap/coincap.js`
+`bin/run action --name getRate --parameter symbol=SAR --integration-parameter debug=false --base-url https://api.coincap.io/v2/ coincap/coincap.js`

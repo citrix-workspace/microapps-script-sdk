@@ -19,8 +19,8 @@ The obtained access token will be stored in the _security_context.json_ file ins
 ###Execute service action with OAuth2
 
 Just Execute with Data output to CONSOLE
-`bin/run action --name uploadFile --configuration-file=script-examples/podio/configPodioOauth.templateUSER.json --parameters=broadcastItemId:123456789,attachment:[script-examples\\podio\\JSONexample.txt] script-examples/podio/podio.js`
-`bin/run action --name updateBroadcast --configuration-file=script-examples/podio/configPodioOauth.templateUSER.json --parameters=broadcastItemId:123456789,broadcastTitle:"This is your new title" script-examples/podio/podio.js`
+`bin/run action --name uploadFile --configuration-file=script-examples/podio/configPodioOauth.templateUSER.json --parameter broadcastItemId=123456789  --parameter attachment="[\"script-examples/podio/JSONexample.txt\"]" script-examples/podio/podio.js`
+`bin/run action --name updateBroadcast --configuration-file=script-examples/podio/configPodioOauth.templateUSER.json --parameter broadcastItemId=123456789 --parameter broadcastTitle="This is your new title" script-examples/podio/podio.js`
 
 Create URL for Chrome debugging
-`java "-Dpolyglot.inspect=true" -jar console-runner-jar-with-dependencies.jar action --name uploadFile --configuration-file=script-examples/podio/configPodioOauth.templateUSER.json --parameters=broadcastItemId:123456789,attachment:[script-examples\\podio\\JSONexample.txt] script-examples/podio/podio.js`
+`java "-Dpolyglot.inspect=true" -jar console-runner-jar-with-dependencies.jar action --name uploadFile --configuration-file=script-examples/podio/configPodioOauth.templateUSER.json --parameter broadcastItemId=123456789 --parameter attachment="[\"script-examples/podio/JSONexample.txt\"]" script-examples/podio/podio.js`

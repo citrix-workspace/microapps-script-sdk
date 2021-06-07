@@ -49,7 +49,7 @@ otherwise the REST call will fail.
 See [Execute sync with basic auth](#basicAuth) to prepare `configJiraBasicAuth.json` config file. Basic auth
 and `baseUrl` are not provided as CLI arguments in the example.
 
-`bin/run action --name createTicket --configuration-file=jira/configJiraBasicAuth.template.json --parameters projectKey:MYPROJECT,summary:"This is summmary",description:"This is description",issueType:Task,reporterId:johndoe jira/jira.js`
+`bin/run action --name createTicket --configuration-file=jira/configJiraBasicAuth.template.json --parameter projectKey=MYPROJECT --parameter summary="This is summmary"  --parameter description="This is description" --parameter issueType=Task --parameter reporterId=johndoe jira/jira.js`
 
 #### Command line arguments
 
@@ -57,7 +57,7 @@ and `baseUrl` are not provided as CLI arguments in the example.
 - `action` - command to run
 - `--name createTicket` - action to run, see `jira.js` for action declarations, it's not a `function` name but it's good convention to use the same name for the `function`
 - `--configuration-file=jira/configJiraBasicAuth.template.json` - path to configuration file
-- `--parameters`
+- `--parameter`
   - `projectKey` (mandatory) - can be derived from project dashboard
     URL `https://jira.acme.com/secure/RapidBoard.jspa?rapidView=1&projectKey=MYPROJECT` or from some existing project
     issue key: `MYPROJECT-1234`
