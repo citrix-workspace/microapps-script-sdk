@@ -16,6 +16,30 @@ integration.define({
   ],
   actions: [
     {
+      name: "bulkStatusUpdate",
+      parameters: [
+        {
+          name: "tickets",
+          type: "ARRAY",
+          required: true,
+          items: {
+            type: "OBJECT",
+            properties: [
+              {
+                name: "issueKey",
+                type: "STRING",
+              },
+              {
+                name: "status",
+                type: "STRING",
+              },
+            ],
+          },
+        },
+      ],
+      function: bulkStatusUpdate,
+    },
+    {
       name: "createTicket",
       parameters: [
         {
@@ -42,6 +66,14 @@ integration.define({
           type: "STRING",
           required: false,
           defaultValue: "Task",
+        },
+        {
+          name: "labels",
+          type: "ARRAY",
+          required: true,
+          items: {
+            type: "STRING",
+          },
         },
       ],
       function: createTicket,
@@ -186,9 +218,7 @@ async function syncTickets(dataStore, client, jql) {
     });
 
     console.log(
-      `Saving ${
-        issues.length
-      } to data store, [${issues
+      `Saving ${issues.length} to data store, [${issues
         .map(({ project, summary }) => JSON.stringify({ project, summary }))
         .join(", ")}]`
     );
@@ -244,6 +274,7 @@ async function createTicket({ client, dataStore, actionParameters }) {
     summary,
     description,
     issueType,
+    labels,
     reporterId,
   } = actionParameters;
   const issueRequest = {
@@ -253,6 +284,7 @@ async function createTicket({ client, dataStore, actionParameters }) {
       },
       summary,
       description,
+      labels,
       issuetype: {
         name: issueType,
       },
@@ -345,4 +377,35 @@ async function addAttachmentsSingleRequest({ client, actionParameters }) {
     throw new Error(errorMessage);
   }
   console.log("Attachment(s) posted");
+}
+
+async function bulkStatusUpdate({ client, actionParameters }) {
+  for (const ticket of actionParameters.tickets) {
+    console.log(`Updating status for ${ticket.issueKey} ticket.`);
+    const request = {
+      transition: {
+        id: ticket.status,
+      },
+    };
+
+    const response = await client.fetch(
+      `/rest/api/2/issue/${ticket.issueKey}/transitions`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      }
+    );
+
+    if (!response.ok) {
+      const errorMessage = `Request failed(${response.status}: ${response.statusText})`;
+      console.error(errorMessage);
+      console.error('Response body:', await response.text());
+      throw new Error(errorMessage);
+    }
+
+    console.log(`Updated status for ${ticket.issueKey} ticket.`);
+  }
 }
