@@ -111,6 +111,13 @@ integration.define({
       function: addAttachmentsSingleRequest,
     },
   ],
+  webhookListeners: [
+    {
+      name: "updateTicketWebhook",
+      listenerFunction: ticketHasChanged,
+      postActionFunction: downloadTicketDetails
+    }
+  ],
   model: {
     tables: [
       {
@@ -204,28 +211,31 @@ async function syncTickets(dataStore, client, jql) {
       `ticket response received, status: ${ret.status}, total: ${currentResponse.total}`
     );
 
-    const issues = currentResponse.issues.map((issue) => {
-      return {
-        id: parseInt(issue.id),
-        key: issue.key,
-        summary: issue.fields.summary,
-        created: moment.utc(issue.fields.created).toDate(),
-        projectId: parseInt(issue.fields.project.id, 10),
-        reporter_email: issue.fields.reporter.emailAddress,
-        reporter_name: issue.fields.reporter.displayName,
-        status: issue.fields.status.name,
-      };
-    });
+    const tickets = currentResponse.issues.map((issue) => mapIssueToTicket(issue));
 
     console.log(
-      `Saving ${issues.length} to data store, [${issues
+      `Saving ${tickets.length} to data store, [${tickets
         .map(({ project, summary }) => JSON.stringify({ project, summary }))
         .join(", ")}]`
     );
 
-    dataStore.save("tickets", issues);
+    dataStore.save("tickets", tickets);
     searchParameters.startAt += searchParameters.maxResults;
   } while (searchParameters.startAt < currentResponse.total);
+}
+
+function mapIssueToTicket(issue) {
+  return {
+    id: parseInt(issue.id),
+    key: issue.key,
+    summary: issue.fields.summary,
+    // FIXME [MICROAPP-15341] date property won't work with webhook: Unsupported value type: class java.time.ZonedDateTime
+    created: moment.utc(issue.fields.created).toDate(),
+    projectId: parseInt(issue.fields.project.id, 10),
+    reporter_email: issue.fields.reporter.emailAddress,
+    reporter_name: issue.fields.reporter.displayName,
+    status: issue.fields.status.name,
+  };
 }
 
 function fullSyncTickets({ dataStore, client, integrationParameters }) {
@@ -311,24 +321,20 @@ async function createTicket({ client, dataStore, actionParameters }) {
     `Issue '${summary}' successfully created: id=${id}, key=${key}, link=${link}`
   );
 
-  const getIssueResponse = await client.fetch(`/rest/api/2/issue/${id}`);
+  // uncomment, when webhook for updating ticket isn't active, otherwise change should be handled by webhook
+  // await getTicket(client, dataStore, id);
+}
+
+async function getTicket(client, dataStore, issueIdOrKey) {
+  const getIssueResponse = await client.fetch(`/rest/api/2/issue/${issueIdOrKey}`);
   if (!getIssueResponse.ok) {
     throw new Error(`Get ticket error: ${getIssueResponse.statusText}`);
   }
 
-  const { fields: issueFields } = await getIssueResponse.json();
-  const ticketModel = {
-    id: parseInt(id),
-    key,
-    summary,
-    created: new Date(issueFields.created),
-    project: projectKey,
-    reporter_email: issueFields.reporter.emailAddress,
-    reporter_name: issueFields.reporter.displayName,
-    status: issueFields.status.name,
-  };
+  const issue = await getIssueResponse.json();
+  const ticket = mapIssueToTicket(issue);
 
-  dataStore.save("tickets", ticketModel);
+  dataStore.save("tickets", ticket);
 }
 
 async function addAttachmentsOneByOne({ client, actionParameters }) {
@@ -408,4 +414,18 @@ async function bulkStatusUpdate({ client, actionParameters }) {
 
     console.log(`Updated status for ${ticket.issueKey} ticket.`);
   }
+}
+
+async function ticketHasChanged({request, integrationParameters, dataStore, webhook}) {
+  const { issue } = await request.json();
+  if (issue) {
+    console.log(`Ticket ${issue.key} has changed.`);
+    webhook.schedulePostWebhookAction({issueIdOrKey: issue.key}); // issue.key can be also used here
+  }
+  return new Response;
+}
+
+async function downloadTicketDetails({parameters, client, dataStore}) {
+  console.log(`Downloading changed details for ${parameters.issueIdOrKey} ticket.`)
+  await getTicket(client, dataStore, parameters.issueIdOrKey);
 }

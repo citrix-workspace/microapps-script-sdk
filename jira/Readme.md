@@ -20,7 +20,7 @@ or
 
 `bin/run sync --name projects --configuration-file=jira/configJiraBasicAuth.template.json jira/jira.js`
 
-###Execute sync with OAuth2
+### Execute sync with OAuth2
 
 Replace all `{{...}}` placeholders in `jira/configJiraOauth.template.json` with real ones.
 (_Use for instance [Insomnia](https://insomnia.rest) to get the refreshToken.
@@ -66,3 +66,18 @@ and `baseUrl` are not provided as CLI arguments in the example.
   - `issueType` (mandatory) - depends on the project configuration, typical values are `Bug`, `Task`, `Story`, etc.
   - `reporterId` (optional) - reporter ID or username (depends on project configuration), the issue is created with reporter same as username used in credentials reporter, if `reporterId` is used then the issue is updated accordingly
 - `jira/jira.js` - path to Javascript file
+
+### Start and invoke webhook listener with issue updated event
+
+The following example starts console runner in simple http server mode which expose URL with webhook listener defined in javascript file and specified by parameter `--name`. When http server is running, can be invoked from tools like curl or Postman.
+
+See [Execute sync with basic auth](#basicAuth) to prepare `configJiraBasicAuth.json` config file. Basic auth
+and `baseUrl` are not provided as CLI arguments in the example. Webhook listener has post webhook action, download ticket detail from Jira, then auth needs to be configured.
+
+`bin\run.bat webhook --name updateTicketWebhook --configuration-file=jira/configJiraBasicAuth.template.json jira/jira.js`
+
+Console runner starts in http server mode on default port (8282), can be changed by parameter. Also prints URL on which is webhook listener exposed, which could be used in next step for invoking webhook listener.
+
+`curl -v -d "{ \"issue\": { \"key\": \"FP-1151\" } }" http://localhost:8282/<uuid>/updateTicketWebhook`
+
+Invoked URL path contains <uuid> placeholder, which will be printed when console runner starts.
