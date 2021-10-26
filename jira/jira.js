@@ -322,10 +322,10 @@ async function createTicket({ client, dataStore, actionParameters }) {
   );
 
   // uncomment, when webhook for updating ticket isn't active, otherwise change should be handled by webhook
-  // await getTicket(client, dataStore, id);
+  // await updateTicketFromSoR(client, dataStore, id);
 }
 
-async function getTicket(client, dataStore, issueIdOrKey) {
+async function updateTicketFromSoR(client, dataStore, issueIdOrKey) {
   const getIssueResponse = await client.fetch(`/rest/api/2/issue/${issueIdOrKey}`);
   if (!getIssueResponse.ok) {
     throw new Error(`Get ticket error: ${getIssueResponse.statusText}`);
@@ -427,5 +427,5 @@ async function ticketHasChanged({request, integrationParameters, dataStore, webh
 
 async function downloadTicketDetails({parameters, client, dataStore}) {
   console.log(`Downloading changed details for ${parameters.issueIdOrKey} ticket.`)
-  await getTicket(client, dataStore, parameters.issueIdOrKey);
+  await updateTicketFromSoR(client, dataStore, parameters.issueIdOrKey);
 }
